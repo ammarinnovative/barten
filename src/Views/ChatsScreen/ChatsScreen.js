@@ -239,7 +239,10 @@ export default function ChatsScreen() {
           >
             Direct Chats
           </Text>
+          <Stack height={'500px'} overflowX={'hidden !important'} overflow={'scroll'} >
           <ActiveProfile getUser={getUser} userList={userList} />
+          
+          </Stack>
         </Stack>
         <Modal isOpen={isOpen} size={"xl"} onClose={onClose}>
           <ModalOverlay />
@@ -341,6 +344,7 @@ export default function ChatsScreen() {
           borderBottom={"1px solid #000"}
           boxShadow={"3px -1px 5px -1px #000"}
           position="relative"
+          height={'700px'}
         >
           {/* Header */}
 
@@ -365,7 +369,7 @@ export default function ChatsScreen() {
               <TabPanels>
                 <TabPanel>
                   <Box
-                    height={"600px"}
+                    height={"500px"}
                     mb={{ base: "50px", sm: "", md: "0px", lg: "", "2xl": "" }}
                     overflow={"auto"}
                   >
