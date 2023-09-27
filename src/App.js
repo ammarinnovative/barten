@@ -3,14 +3,15 @@ import { extendTheme, ChakraProvider } from "@chakra-ui/react";
 import { Home } from "./Views/Home/Home";
 import { Router } from "./routes/routes";
 import store from "./app/store";
-import { useEffect } from "react";
-import { useDispatch } from "react-redux";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import Cookies from "js-cookie";
 import { addUser } from "./reducers/UserReducer";
 // import { detectOverflow } from '@popperjs/core;
 
 
 function App() {
+  const [user,setUser] = useState({});
   const dispatch = useDispatch();
   useEffect(() => {
     (async () => {
@@ -25,6 +26,7 @@ function App() {
       }
     })();
   }, []);
+
 
   return (
     <ChakraProvider>

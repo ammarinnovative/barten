@@ -1,18 +1,42 @@
-import React from 'react'
-import { Text , Stack, Image } from '@chakra-ui/react'
-export default function ChatsActiveProfile({data}) {
-  return (
-    data.map((d)=>{
-      return(
-        <Stack spacing={"2"} key={d.id} direction="row" alignItems={"center"} p={"8px 0px"} borderRight={"1px solid #ddd"} borderBottom={"1px solid #ddd"}>
-          <Image width={{base:"18%", sm:"23%", md: '18%', lg: '', '2xl':''}}  opacity={"0.5"} src={d.img}></Image>
-          <Text fontSize={{base:"18px", sm:"12px", md: '18px', lg: '', '2xl':''}} color={"#000"} opacity={"0.5"} fontWeight={"600"}>
-              {d.name}
-          </Text>
-        </Stack>
-      )
-    }) 
-  )
+import React from "react";
+import { CgProfile } from "react-icons/cg";
+import { Text, Stack, Image } from "@chakra-ui/react";
+import { imageURL } from "../../utilities/config";
+export default function ChatsActiveProfile({ getUser, userList }) {
+  return userList?.map((d) => {
+    console.log(imageURL + d?.user?.profile_picture);
+    return (
+      <Stack
+        cursor={"pointer"}
+        onClick={() => {
+          getUser(d.user);
+        }}
+        spacing={"2"}
+        key={d.id}
+        direction="row"
+        alignItems={"center"}
+        p={"8px 0px"}
+        borderRight={"1px solid #ddd"}
+        borderBottom={"1px solid #ddd"}
+      >
+        {d?.user?.profile_picture ? (
+          <Image
+            width={"27px"}
+            height={"27px"}
+            borderRadius={"50%"}
+            src={imageURL + d?.user?.profile_picture}
+          />
+        ) : (
+          <CgProfile fontSize={"23px"} />
+        )}
+        <Text
+          fontSize={{ base: "18px", sm: "12px", md: "18px", lg: "", "2xl": "" }}
+          color={"#000"}
+          fontWeight={"600"}
+        >
+          {d?.user?.fullname}
+        </Text>
+      </Stack>
+    );
+  });
 }
-
-

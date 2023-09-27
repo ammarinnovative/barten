@@ -38,8 +38,7 @@ const UserDetail = () => {
     });
     setData(res?.data);
   };
-  console.log(data);
-
+  console.log("data",data); 
   useEffect(() => {
     if (user) {
       getUserData();

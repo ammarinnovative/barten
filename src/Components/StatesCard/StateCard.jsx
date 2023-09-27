@@ -1,6 +1,7 @@
 import { Box, Text } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import ApexCharts from "apexcharts";
+import { Link } from "react-router-dom";
 import ReactApexChart from "react-apexcharts";
 import { useSelector } from "react-redux";
 import { GET } from "../../utilities/ApiProvider";
@@ -109,7 +110,9 @@ const StateCard = ({ series1, percentage, color }) => {
             >
               {totalUser??"0"}
             </Text>
+            <Link to="/dashboard/user">
             <Text cursor={"pointer"}>View All</Text>
+            </Link>
           </Box>
         </Box>
         <Box

@@ -1,7 +1,7 @@
 import { FaHome, FaUserCheck, FaDollarSign } from "react-icons/fa";
 import React, { ReactNode, useEffect, useState } from "react";
 import { Link as ReactLink, useLocation, useNavigate } from "react-router-dom";
-import Logo from "../../Assets/Images/Logo.png"
+import Logo from "../../Assets/Images/Logo.png";
 import { SearchIcon } from "@chakra-ui/icons";
 import {
   IconButton,
@@ -42,8 +42,8 @@ import {
   FiChevronDown,
 } from "react-icons/fi";
 import { IconType } from "react-icons";
-import { MdOutlinePayment } from 'react-icons/md';
-import { HiSpeakerphone } from 'react-icons/hi';
+import { MdOutlinePayment } from "react-icons/md";
+import { HiSpeakerphone } from "react-icons/hi";
 import { ReactText } from "react";
 import {
   BsWallet,
@@ -52,8 +52,10 @@ import {
   BsFillCloudUploadFill,
 } from "react-icons/bs";
 import { logout } from "../../reducers/UserReducer";
-import { useDispatch } from "react-redux";
-import { RiWechatPayLine } from 'react-icons/ri';
+import { useDispatch, useSelector } from "react-redux";
+import { RiWechatPayLine } from "react-icons/ri";
+import { CgProfile } from "react-icons/cg";
+import { imageURL } from "../../utilities/config";
 import { Button } from "antd";
 
 const LinkItems = [
@@ -78,6 +80,8 @@ export default function SidebarWithHeader({ children }) {
   }, [location]);
 
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const selector = useSelector((state) => state);
+
 
   const [same, setSame] = useState("true");
   return (
@@ -100,7 +104,12 @@ export default function SidebarWithHeader({ children }) {
         </DrawerContent>
       </Drawer>
 
-      <MobileNav onOpen={onOpen} tarLoc={curLoc} />
+      <MobileNav
+        imageURL={imageURL}
+        onOpen={onOpen}
+        profile={selector?.user?.user?.profile_picture}
+        tarLoc={curLoc}
+      />
       <Box ml={{ base: 0, md: 60 }} p="4">
         {children}
       </Box>
@@ -155,7 +164,9 @@ const NavItem = ({ icon, url, children, ...rest }) => {
   const location = useLocation();
   return (
     <Link
-      color={url === location.pathname ? "hsl(352.86deg 100% 32.94%)" : "gray.200"}
+      color={
+        url === location.pathname ? "hsl(352.86deg 100% 32.94%)" : "gray.200"
+      }
       href="#"
       style={{ textDecoration: "none" }}
       _focus={{ boxShadow: "none" }}
@@ -178,7 +189,7 @@ const NavItem = ({ icon, url, children, ...rest }) => {
   );
 };
 
-const MobileNav = ({ onOpen, tarLoc, ...rest }) => {
+const MobileNav = ({ onOpen, profile, imageURL, tarLoc, ...rest }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const clearItem = () => {
@@ -226,7 +237,6 @@ const MobileNav = ({ onOpen, tarLoc, ...rest }) => {
       </Text>
 
       <HStack spacing={{ base: "0", md: "6" }}>
-        
         <Flex alignItems={"center"}>
           <Menu>
             <MenuButton
@@ -235,12 +245,11 @@ const MobileNav = ({ onOpen, tarLoc, ...rest }) => {
               _focus={{ boxShadow: "none" }}
             >
               <HStack>
-                <Avatar
-                  size={"sm"}
-                  src={
-                    "https://images.unsplash.com/photo-1619946794135-5bc917a27793?ixlib=rb-0.3.5&q=80&fm=jpg&crop=faces&fit=crop&h=200&w=200&s=b616b2c5b373a80ffc9636ba24f7a4a9"
-                  }
-                />
+                {profile ? (
+                  <Avatar size={"sm"} src={imageURL + profile ?? CgProfile} />
+                ) : (
+                  <CgProfile />
+                )}
                 <VStack
                   display={{ base: "none", md: "flex" }}
                   alignItems="flex-start"
@@ -251,9 +260,6 @@ const MobileNav = ({ onOpen, tarLoc, ...rest }) => {
                     Admin
                   </Text>
                 </VStack>
-                <Box display={{ base: "none", md: "flex" }}>
-                  <FiChevronDown />
-                </Box>
               </HStack>
             </MenuButton>
             <MenuList
@@ -261,7 +267,9 @@ const MobileNav = ({ onOpen, tarLoc, ...rest }) => {
               borderColor={useColorModeValue("gray.200", "gray.700")}
             >
               <MenuItem>Profile</MenuItem>
-             <Link as={ReactLink} to="/dashboard/Setting"><MenuItem>Settings</MenuItem></Link>
+              <Link as={ReactLink} to="/dashboard/Setting">
+                <MenuItem>Settings</MenuItem>
+              </Link>
               <MenuDivider />
 
               <MenuItem onClick={() => clearItem()}>Sign out</MenuItem>

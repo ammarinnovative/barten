@@ -43,7 +43,7 @@ export const Setting = () => {
   // const token = selector.user.user.data.data.JWT_TOKEN;
   const [state, setState] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [image, setImage] = useState({});
+  const [image, setImage] = useState("");
   const [feields, setFields] = useState({
     password: "",
     confirmPassword: "",
@@ -62,6 +62,9 @@ export const Setting = () => {
   }, [selector]);
 
 
+  console.log(selectedUser);
+
+
   const uploadImage = async () => {
     setLoading(true);
     if(!image){
@@ -72,6 +75,7 @@ export const Setting = () => {
         duration:5000,
         description:"PLease select the image first"
       });
+      setLoading(false);
       return;
     }
     const formData = new FormData();
@@ -83,7 +87,14 @@ export const Setting = () => {
         authorization: `bearer ${selectedUser?.verificationToken}`,
       }
     );
-    console.log(res);
+    console.log("res",res);
+    toast({
+      position:"bottom-left",
+      isClosable:true,
+      duration:5000,
+      status:res.data.status,
+      description:res.data.message
+    });
     setLoading(false);
   };
 
@@ -119,7 +130,7 @@ export const Setting = () => {
     const res = await PUT(`admin/updateUser/${selectedUser?._id}`, data, {
       authorization: `bearer ${selectedUser?.verificationToken}`,
     });
-    console.log(res);
+    console.log("res",res);
 
     if (res.status == 200) {
       toast({
@@ -142,6 +153,7 @@ export const Setting = () => {
         duration: 5000,
         isClosable: true,
       });
+      setState(false);
     }
 
     setFields({

@@ -54,6 +54,7 @@ const Pagination = ({ pageCount,getCurrentPage,totalPages }) => {
         onPageChange={handlePageChange}
         containerClassName={'pagination'}
         activeClassName={'active'}
+        disableInitialCallback={true}
       />
     </div>
   );

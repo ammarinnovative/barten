@@ -46,8 +46,8 @@ export const UserScreen = () => {
   const [data, setData] = useState([]);
   const [user, settUser] = useState({});
   const [toggle, setToggle] = useState(false);
-  const [currentPage,setCurrentPage] = useState(1);
-  const [totalPages,setTotalPages] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
   const [load, setLoad] = useState(false);
   const [details, setDetails] = useState({
     name: "",
@@ -81,7 +81,6 @@ export const UserScreen = () => {
     setLoad(false);
   };
 
-
   useEffect(() => {
     if (selecor) {
       settUser(selecor?.user?.user);
@@ -98,10 +97,11 @@ export const UserScreen = () => {
     if (user) {
       getUser();
     }
-  }, [user,currentPage]);
+  }, [user, currentPage]);
 
   const btnData = (data) => {
     setFilterData(field[data]);
+    setSelected("bartender");
   };
 
   const btnItems = (_name, _number, _id) => {
@@ -115,12 +115,9 @@ export const UserScreen = () => {
 
   const pageCount = 10;
 
-
-  const getCurrentPage = (e)=>{
+  const getCurrentPage = (e) => {
     setCurrentPage(e);
-  }
-
-  
+  };
 
   return (
     <Sidebar>
@@ -226,8 +223,7 @@ export const UserScreen = () => {
               visible={true}
             />
           </Box>
-        ) : (
-          filterData.length>0?
+        ) : filterData?.length > 0 ? (
           filterData &&
           filterData?.map((data) => {
             return (
@@ -241,10 +237,20 @@ export const UserScreen = () => {
                 profile={data?.profile_picture ?? ""}
               />
             );
-          }):<Text display={"grid"} height={"60vh"} placeItems={"center"}>No data found</Text>
+          })
+        ) : (
+          <Text display={"grid"} height={"60vh"} placeItems={"center"}>
+            No data found
+          </Text>
         )}
       </Box>
-      <Pagination totalPages={totalPages} getCurrentPage={getCurrentPage} pageCount={pageCount}/>
+      {totalPages?.length > 1 && (
+        <Pagination
+          totalPages={totalPages}
+          getCurrentPage={getCurrentPage}
+          pageCount={pageCount}
+        />
+      )}
     </Sidebar>
   );
 };

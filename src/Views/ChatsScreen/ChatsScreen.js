@@ -47,65 +47,12 @@ import {
 } from "@chakra-ui/react";
 import userEvent from "@testing-library/user-event";
 import io from "socket.io-client";
-import { socketUrl } from "../../utilities/config";
-var socket;
+import { message } from "antd";
 
 export default function ChatsScreen() {
-  const [data, setData] = useState([
-    {
-      name: "Crypto Trading",
-      img: CahtProfile,
-      id: 1,
-    },
-    {
-      name: "Stock Marketing",
-      img: CahtProfile,
-      id: 2,
-    },
-    {
-      name: "Nfts Bet",
-      img: CahtProfile,
-      id: 3,
-    },
-  ]);
-
-  const [data2, setData2] = useState([
-    {
-      name: "John Doe",
-      img: Avatar,
-      id: 4,
-    },
-    {
-      name: "Alexa Alexander",
-      img: Avatar2,
-      id: 5,
-    },
-    {
-      name: "Adam Knight",
-      img: Avatar3,
-      id: 6,
-    },
-  ]);
-
-  const [data3, setData3] = useState([
-    {
-      name: "Crypto Trading",
-      img: CahtProfile,
-      id: 7,
-    },
-    {
-      name: "Stock Marketing",
-      img: CahtProfile,
-      id: 8,
-    },
-    {
-      name: "Nfts Bet",
-      img: CahtProfile,
-      id: 9,
-    },
-  ]);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const toast = useToast();
+  const [socket, setSocket] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const [fields, setFields] = useState({
@@ -115,6 +62,9 @@ export default function ChatsScreen() {
     categories: [],
   });
   const [category, setCategories] = useState([]);
+  const [userList, setUserList] = useState([]);
+  const [selectUser, setSelectUser] = useState(false);
+  const [chatUser, setChatUser] = useState({});
   const GetCategories = async () => {
     // const res =await GET(`courseCategory/getAllCourseCategoryList`,{
     //     authorization: `bearer${`${user.JWT_TOKEN}`}`
@@ -122,7 +72,7 @@ export default function ChatsScreen() {
     const res = await GET("courseCategory/getAllCourseCategoryList", {
       authorization: `bearer ${user?.JWT_TOKEN}`,
     });
-    setCategories(res.data);
+    setCategories(res?.data);
   };
 
   const [membership, setMembership] = useState([]);
@@ -138,8 +88,7 @@ export default function ChatsScreen() {
 
   useEffect(() => {
     if (selector) {
-      console.log(selector?.user?.user?.data?.data);
-      setUser(selector?.user?.user?.data?.data);
+      setUser(selector?.user?.user);
     }
   }, [selector]);
 
@@ -204,58 +153,64 @@ export default function ChatsScreen() {
     setLoading(false);
   };
 
+  const getUser = async (data) => {
+    setChatUser(data);
+    socket?.emit("chatMessages", {
+      senderId: user?._id,
+      receiverId: data._id,
+    });
+    setSelectUser(true);
+  };
+
   // ! SOCKET IMPLEMENTATIONS
 
-  // State to check if socket connected successfully!
   const [socketConnected, setSocketConnected] = useState(false);
   const [messageList, setMessageList] = useState([]);
-  const [messageField, setMessageField] = useState('');
+  const [messageField, setMessageField] = useState("");
 
-  // To establish connection of socket if socket is not connected and after connection is
-  // created emitting chatMessage to get the array of the message behalf of the reciever's ID.
+  console.log(messageList);
 
   useEffect(() => {
     if (user) {
-      if (!socketConnected) {
-        socket = io("143.198.160.137:5405");
-        socket.connect();
-        socket.on('connected', () => {
-          console.log('Socket connected successfully!');
-          setSocketConnected(true);
-        });
-      }
-      socket?.emit('chatMessages', {
-        senderId: user?._id,
-        receiverId: "646f08905d9a442875f38ffc"
-      });
+      setSocket(io("http://24.199.93.30:5000"));
     }
   }, [user]);
 
-  // A listener which listens upon chatMessages and bring updated array of the message
   useEffect(() => {
-    if (socketConnected) {
-      socket?.on('chatMessages', (messageList) => {
-        console.log('message list from socket server', messageList);
-        console.log(typeof messageList);
-        if (messageList?.message) {
-          setMessageList((prev) => [...prev, messageList]);
-        } else {
-          setMessageList((prev) => [...prev, ...messageList]);
-        }
-      });
-    }
-  }, [socketConnected]);
+    socket?.on("chatList", (data) => {
+      setUserList(data);
+    });
+    socket?.emit("chatList", {
+      senderId: user?._id,
+    });
+
+    // socket?.on("chatMessages", (vals) => {
+    //   setMessageList(vals);
+    //   console.log("work", vals);
+    // });
+    socket?.on("chatMessages", (newMessages) => {
+      setMessageList((prevMessages) => [...prevMessages, ...newMessages]);
+    });
+  }, [socket]);
 
   const sendMessage = () => {
-    if (messageField !== '') {
-      console.log(messageField);
-      socket?.emit('message', {
+    if (messageField !== "") {
+      socket?.emit("message", {
         senderId: user?._id,
-        receiverId: "646f08905d9a442875f38ffc",
-        message: messageField
+        receiverId: chatUser._id,
+        message: messageField,
       });
+      setMessageField("");
+      setMessageList((prevMessages) => [
+        ...prevMessages,
+        {
+          senderId: user?._id,
+          receiverId: chatUser._id,
+          message: messageField,
+        },
+      ]);
     }
-  }
+  };
 
   return (
     <Sidebar>
@@ -275,12 +230,16 @@ export default function ChatsScreen() {
           <Heading as="h2" size="md">
             All Chats
           </Heading>
-          
-          <Text color={"hsl(352.86deg 100% 32.94%)"} mt={"20px"} mb={"20px"} fontWeight={"600"}>
+
+          <Text
+            color={"hsl(352.86deg 100% 32.94%)"}
+            mt={"20px"}
+            mb={"20px"}
+            fontWeight={"600"}
+          >
             Direct Chats
           </Text>
-          <ActiveProfile data={data2} />
-
+          <ActiveProfile getUser={getUser} userList={userList} />
         </Stack>
         <Modal isOpen={isOpen} size={"xl"} onClose={onClose}>
           <ModalOverlay />
@@ -384,337 +343,156 @@ export default function ChatsScreen() {
           position="relative"
         >
           {/* Header */}
-          <Box bg={"hsl(352.86deg 100% 32.94%)"} color={"#fff"} padding={"15px 30px"}>
-            <Flex alignItems={"center"} justifyContent={"space-between"}>
-              <Heading as="h2" size="md">
-                Alexa John
-              </Heading>
-              <Link to="/">
-                <FaEllipsisV />
-              </Link>
-            </Flex>
-          </Box>
-          {/* tabs */}
-          <Tabs >
-            <TabList borderBottom={"1px solid #1e2597"}>
-            
-              <Tab
-                fontSize={{
-                  base: "15px",
-                  sm: "",
-                  md: "row",
-                  lg: "",
-                  "2xl": "24px",
-                }}
-                color={"#727272"}
-                fontWeight={"600"}
-              >
-                Alex John
-              </Tab>
-            </TabList>
 
-            {/* chat */}
-            <TabPanels>
-              
-            <TabPanel>
-                <Box
-                  height={"600px"}
-                  mb={{ base: "50px", sm: "", md: "0px", lg: "", "2xl": "" }}
-                  overflow={"auto"}
-                >
-                  {
-                    messageList.length &&
-                    messageList?.map(data =>
-                      <Box
-                        key={data?._id}
-                        padding={{
-                          base: "0",
-                          sm: "",
-                          md: "10px",
-                          lg: "",
-                          "2xl": "",
-                        }}
-                      >
-                        <Stack
-                          spacing={{
+          <>
+            <Box
+              bg={"hsl(352.86deg 100% 32.94%)"}
+              color={"#fff"}
+              padding={"15px 30px"}
+            >
+              <Flex alignItems={"center"} justifyContent={"space-between"}>
+                <Heading as="h2" size="md">
+                  {chatUser?.fullname}
+                </Heading>
+                <Link to="/">
+                  <FaEllipsisV />
+                </Link>
+              </Flex>
+            </Box>
+            {/* tabs */}
+            <Tabs>
+              {/* chat */}
+              <TabPanels>
+                <TabPanel>
+                  <Box
+                    height={"600px"}
+                    mb={{ base: "50px", sm: "", md: "0px", lg: "", "2xl": "" }}
+                    overflow={"auto"}
+                  >
+                    {messageList?.length > 0 ? (
+                      messageList &&
+                      messageList?.map((data) => (
+                        <Box
+                          key={data?._id}
+                          padding={{
                             base: "0",
                             sm: "",
-                            md: "6",
+                            md: "10px",
                             lg: "",
                             "2xl": "",
                           }}
-                          direction={user?._id === data?.senderId ? 'row-reverse' : 'row'}
-                          alignItems={"center"}
-                          paddingBottom={"20px"}
                         >
-                          <Image
-                            width={{
-                              base: "15%",
-                              sm: "8%",
-                              md: "3%",
+                          <Stack
+                            spacing={{
+                              base: "0",
+                              sm: "",
+                              md: "6",
                               lg: "",
                               "2xl": "",
                             }}
-                            src={Avatar4}
-                          ></Image>
-                          <Text
-                            fontSize={"md"}
-                            bg={user?._id === data?.senderId ? "#1e2597" : "#b2b2b2"}
-                            color={user?._id === data?.senderId ? "#fff" : "#000"}
-                            borderRadius={user?._id === data?.senderId ? "12px 12px 0px 12px" : "12px 12px 12px 0px"}
-                            padding={"10px 20px"}
+                            direction={
+                              user?._id === data?.senderId
+                                ? "row-reverse"
+                                : "row"
+                            }
+                            alignItems={"center"}
+                            paddingBottom={"20px"}
                           >
-                            {data?.message ?? 'Waiting for this message to arrive...'}
-                          </Text>
-                        </Stack>
-                      </Box>
-                    )
-                  }
-
-                </Box>
-              </TabPanel>
-              <TabPanel>
-                <Box
-                  height={"600px"}
-                  mb={{ base: "50px", sm: "", md: "0px", lg: "", "2xl": "" }}
-                  overflow={"auto"}
-                >
-                  <Box
-                    padding={{
-                      base: "0px 0px",
-                      sm: "",
-                      md: "10px 30px",
-                      lg: "",
-                      "2xl": "",
-                    }}
-                  >
-                    <Stack
-                      spacing={{
-                        base: "0",
-                        sm: "",
-                        md: "6",
-                        lg: "",
-                        "2xl": "",
-                      }}
-                      direction="row"
-                      alignItems={"center"}
-                      justifyContent={"right"}
-                      textAlign={"left"}
-                      paddingBottom={"20px"}
-                    >
-                      <Text
-                        fontSize={"md"}
-                        bg={"#1e2598"}
-                        color={"#fff"}
-                        borderRadius={"12px 12px 0px 12px"}
-                        padding={"10px 20px"}
-                      >
-                        Duis aute irure dolor in reprehenderit
-                      </Text>
-                      <Image
-                        width={{
-                          base: "15%",
-                          sm: "8%",
-                          md: "3%",
-                          lg: "",
-                          "2xl": "",
-                        }}
-                        src={CahtProfilein2}
-                      ></Image>
-                    </Stack>
+                            <Image
+                              width={{
+                                base: "15%",
+                                sm: "8%",
+                                md: "3%",
+                                lg: "",
+                                "2xl": "",
+                              }}
+                              src={Avatar4}
+                            ></Image>
+                            <Text
+                              fontSize={"md"}
+                              bg={
+                                user?._id === data?.senderId
+                                  ? "#1e2597"
+                                  : "#b2b2b2"
+                              }
+                              color={
+                                user?._id === data?.senderId ? "#fff" : "#000"
+                              }
+                              borderRadius={
+                                user?._id === data?.senderId
+                                  ? "12px 12px 0px 12px"
+                                  : "12px 12px 12px 0px"
+                              }
+                              padding={"10px 20px"}
+                            >
+                              {data?.message ??
+                                "Waiting for this message to arrive..."}
+                            </Text>
+                          </Stack>
+                        </Box>
+                      ))
+                    ) : (
+                      <Text color={"black"}>No Conversation yet</Text>
+                    )}
                   </Box>
+                </TabPanel>
+              </TabPanels>
+            </Tabs>
 
-                  <Box
-                    padding={{
-                      base: "0px 0px",
-                      sm: "",
-                      md: "10px 30px",
-                      lg: "",
-                      "2xl": "",
-                    }}
-                  >
-                    <Stack
-                      spacing={{
-                        base: "0",
-                        sm: "",
-                        md: "6",
-                        lg: "",
-                        "2xl": "",
-                      }}
-                      direction="row"
-                      alignItems={"center"}
-                      justifyContent={"right"}
-                      textAlign={"left"}
-                      paddingBottom={"20px"}
-                    >
-                      <Text
-                        fontSize={"md"}
-                        bg={"#1e2598"}
-                        color={"#fff"}
-                        borderRadius={"12px 12px 0px 12px"}
-                        padding={"10px 20px"}
-                      >
-                        Duis aute irure dolor in reprehenderit
-                      </Text>
-                      <Image
-                        width={{
-                          base: "15%",
-                          sm: "8%",
-                          md: "3%",
-                          lg: "",
-                          "2xl": "",
-                        }}
-                        src={CahtProfilein2}
-                      ></Image>
-                    </Stack>
-                  </Box>
-
-                  <Box
-                    padding={{
-                      base: "0px 0px",
-                      sm: "",
-                      md: "10px 30px",
-                      lg: "",
-                      "2xl": "",
-                    }}
-                  >
-                    <Stack
-                      spacing={{
-                        base: "0",
-                        sm: "",
-                        md: "6",
-                        lg: "",
-                        "2xl": "",
-                      }}
-                      direction="row"
-                      alignItems={"center"}
-                      justifyContent={"right"}
-                      textAlign={"left"}
-                      paddingBottom={"20px"}
-                    >
-                      <Text
-                        fontSize={"md"}
-                        bg={"#1e2598"}
-                        color={"#fff"}
-                        borderRadius={"12px 12px 0px 12px"}
-                        padding={"10px 20px"}
-                      >
-                        Duis aute irure dolor in reprehenderit
-                      </Text>
-                      <Image
-                        width={{
-                          base: "15%",
-                          sm: "8%",
-                          md: "3%",
-                          lg: "",
-                          "2xl": "",
-                        }}
-                        src={CahtProfilein2}
-                      ></Image>
-                    </Stack>
-                  </Box>
-                  <Box
-                    padding={{
-                      base: "0px 0px",
-                      sm: "",
-                      md: "10px 30px",
-                      lg: "",
-                      "2xl": "",
-                    }}
-                  >
-                    <Stack
-                      spacing={{
-                        base: "0",
-                        sm: "",
-                        md: "6",
-                        lg: "",
-                        "2xl": "",
-                      }}
-                      direction="row"
-                      alignItems={"center"}
-                      justifyContent={"right"}
-                      textAlign={"left"}
-                      paddingBottom={"20px"}
-                    >
-                      <Text
-                        fontSize={"md"}
-                        bg={"#1e2598"}
-                        color={"#fff"}
-                        borderRadius={"12px 12px 0px 12px"}
-                        padding={"10px 20px"}
-                      >
-                        Duis aute irure dolor in reprehenderit
-                      </Text>
-                      <Image
-                        width={{
-                          base: "15%",
-                          sm: "8%",
-                          md: "3%",
-                          lg: "",
-                          "2xl": "",
-                        }}
-                        src={CahtProfilein2}
-                      ></Image>
-                    </Stack>
-                  </Box>
-                </Box>
-              </TabPanel>
-            </TabPanels>
-          </Tabs>
-
-          {/* writter */}
-          <Stack
-            bg={"#c8c8c8"}
-            position={"absolute"}
-            w={"100%"}
-            bottom={"0"}
-            padding={{
-              base: "10px 10px",
-              sm: "",
-              md: "10px 30px",
-              lg: "",
-              "2xl": "",
-            }}
-            justifyContent={"space-between"}
-            direction={"column,row"}
-            alignItems={"center"}
-          >
-            <Link to="/">
-              <LinkIcon fontSize={"20px"} color={"#000"} />
-            </Link>
-            <Input
-              type="text"
-              color={"#000"}
-              border={"none"}
-              height={"auto"}
-              placeholder=" Enter your message"
-              _placeholder={{ color: "#000" }}
-              _focusVisible={{ border: "none" }}
-              value={messageField}
-              onChange={e => setMessageField(e.target.value)}
-            />
-            <Button
-              onClick={sendMessage}
+            {/* writter */}
+            <Stack
+              bg={"#c8c8c8"}
+              position={"absolute"}
+              w={"100%"}
+              bottom={"0"}
               padding={{
-                base: "25px 20px",
+                base: "10px 10px",
                 sm: "",
-                md: "25px 50px",
+                md: "10px 30px",
                 lg: "",
                 "2xl": "",
               }}
-              BorderRadius={"3px"}
-              bg={"hsl(352.86deg 100% 32.94%)"}
-              color={"#fff"}
-              _hover={{
-                bg: "transparent",
-                border: "1px solid hsl(352.86deg 100% 32.94%)",
-                color: "hsl(352.86deg 100% 32.94%)",
-                transition: "all 0.3s",
-              }}
+              justifyContent={"space-between"}
+              direction={"column,row"}
+              alignItems={"center"}
             >
-              Send
-            </Button>
-          </Stack>
+              <Link to="/">
+                <LinkIcon fontSize={"20px"} color={"#000"} />
+              </Link>
+              <Input
+                type="text"
+                color={"#000"}
+                border={"none"}
+                height={"auto"}
+                placeholder=" Enter your message"
+                _placeholder={{ color: "#000" }}
+                _focusVisible={{ border: "none" }}
+                value={messageField}
+                onChange={(e) => setMessageField(e.target.value)}
+              />
+              <Button
+                padding={{
+                  base: "25px 20px",
+                  sm: "",
+                  md: "25px 50px",
+                  lg: "",
+                  "2xl": "",
+                }}
+                BorderRadius={"3px"}
+                bg={"hsl(352.86deg 100% 32.94%)"}
+                color={"#fff"}
+                onClick={sendMessage}
+                _hover={{
+                  bg: "transparent",
+                  border: "1px solid hsl(352.86deg 100% 32.94%)",
+                  color: "hsl(352.86deg 100% 32.94%)",
+                  transition: "all 0.3s",
+                }}
+              >
+                Send
+              </Button>
+            </Stack>
+          </>
         </Stack>
       </Stack>
     </Sidebar>
