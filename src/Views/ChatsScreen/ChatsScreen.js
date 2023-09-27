@@ -191,6 +191,9 @@ export default function ChatsScreen() {
     socket?.on("chatMessages", (newMessages) => {
       setMessageList((prevMessages) => [...prevMessages, ...newMessages]);
     });
+    socket?.on("message", (code) => {
+      console.log("Ammar is here");
+    });
   }, [socket]);
 
   const sendMessage = () => {
@@ -412,7 +415,7 @@ export default function ChatsScreen() {
                               fontSize={"md"}
                               bg={
                                 user?._id === data?.senderId
-                                  ? "#1e2597"
+                                  ? "hsl(352.86deg 100% 32.94%)"
                                   : "#b2b2b2"
                               }
                               color={
