@@ -18,6 +18,7 @@ export default function ChatsActiveProfile({ getUser, userList }) {
         p={"8px 0px"}
         borderRight={"1px solid #ddd"}
         borderBottom={"1px solid #ddd"}
+        
       >
         {d?.user?.profile_picture ? (
           <Image
