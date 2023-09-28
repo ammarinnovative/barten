@@ -32,26 +32,28 @@ import { AiFillStar } from "react-icons/ai";
 import store from "../../app/store.js";
 
 export const Home = () => {
-  const navigate = useNavigate();
-  const selector = useSelector((store) => store);
-  const [percentage,setPercentage] = useState([]);
-  const [series,setSeries] = useState([]);
-  const [color,setColor] = useState([]);
+  const [percentage, setPercentage] = useState([]);
+  const [series, setSeries] = useState([]);
+  const [color, setColor] = useState([]);
   const [user, setUser] = useState();
   const [data, setData] = useState([]);
   const [users, setUsers] = useState([]);
 
-  useEffect(() => {
-    if (user === null) {
-      navigate("/login");
-    }
-  }, [selector]);
+
+  const selector = useSelector((store) => store);
+  const userss= selector?.user?.user;
+  const navigate = useNavigate();
+
+
 
   useEffect(() => {
     if (selector) {
       setUser(selector?.user?.user);
     }
   }, [selector]);
+
+
+
 
   const getData = async () => {
     const res = await GET("admin/home", {
@@ -62,14 +64,18 @@ export const Home = () => {
     setSeries(res?.data[2]?.rolePercentage?.options?.series);
     setColor(res?.data[2]?.rolePercentage?.options?.color);
   };
-
+  
+  
 
   useEffect(() => {
     if (user) {
       getData();
     }
-  }, [user]);
 
+    if(!JSON.parse(localStorage.getItem("userss"))){
+      navigate("/login")
+    }
+  }, [user,navigate]);
 
   return (
     <Sidebar>
@@ -87,9 +93,9 @@ export const Home = () => {
           Bartenders
         </Text>
         <Link to={`/dashboard/user`}>
-        <Text color={"gray.500"} fontSize={"18px"} fontWeight={"normal"}>
-          See All
-        </Text>
+          <Text color={"gray.500"} fontSize={"18px"} fontWeight={"normal"}>
+            See All
+          </Text>
         </Link>
       </Box>
       <Box
@@ -105,7 +111,7 @@ export const Home = () => {
                 <Box
                   padding={"10px 20px"}
                   backgroundColor={"white"}
-                  width={{base:"100%",md:"90%",lg:"45%"}}
+                  width={{ base: "100%", md: "90%", lg: "45%" }}
                   key={item._id}
                   borderRadius={"10px"}
                 >
@@ -200,7 +206,7 @@ export const Home = () => {
             FoodServers
           </Text>
           <Link to={`/dashboard/user`}>
-          <Text>View All</Text>
+            <Text>View All</Text>
           </Link>
         </Box>
         <Box
@@ -279,13 +285,13 @@ export const Home = () => {
           User
         </Text>
         <Link to={`/dashboard/user`}>
-        <Text>View All</Text>
+          <Text>View All</Text>
         </Link>
       </Box>
       <Box display={"flex"} gap={"40px"} flexDirection={"column"}>
-        { data && data.length > 0
+        {data && data.length > 0
           ? data[5]?.allUser?.latestUser.map((item) => {
-            console.log(item)
+              console.log(item);
               return (
                 <Box
                   display={"flex"}
@@ -323,7 +329,7 @@ export const Home = () => {
                   </Box>
                   <Box display={{ base: "none", md: "block" }}>
                     <Text color={"gray.500"}>User Type</Text>
-                    <Text>{item?.user_type?item?.user_type:"none"}</Text>
+                    <Text>{item?.user_type ? item?.user_type : "none"}</Text>
                   </Box>
                   <Link to={`/dashboard/UserDetails/${item._id}`}>
                     <Button color={"gray.500"} border={"1px solid gray"}>

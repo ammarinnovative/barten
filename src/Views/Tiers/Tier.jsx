@@ -42,6 +42,7 @@ import Item from "antd/es/list/Item";
 import StateCard from "../../Components/StatesCard/StateCard";
 import ReactPaginate from "react-paginate";
 import Pagination from "../../Components/Pagination/Pagination";
+import { useNavigate } from "react-router-dom";
 import { TailSpin } from "react-loader-spinner";
 import { Link } from "react-router-dom";
 export const Tiers = () => {
@@ -58,6 +59,7 @@ export const Tiers = () => {
   const [stateLoad, setStateLoad] = useState(false);
   const [id, setId] = useState("");
   const [totalRecords, setTotalRecords] = useState();
+  const naviaget = useNavigate();
   const [fields, setFields] = useState({
     name: "",
     price: null,
@@ -86,7 +88,12 @@ export const Tiers = () => {
     if (user) {
       getData();
     }
-  }, [user]);
+
+    if(!JSON.parse(localStorage.getItem("userss"))){
+      naviaget("/login");
+    }
+    
+  }, [user,naviaget]);
 
   console.log(fields);
 

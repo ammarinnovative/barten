@@ -14,6 +14,7 @@ import { AiFillStar } from "react-icons/ai";
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from "@chakra-ui/react";
 import { BsThreeDots } from "react-icons/bs";
 import { useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { GET } from "../../utilities/ApiProvider";
 import { imageURL } from "../../utilities/config";
 import { useSelector } from "react-redux";
@@ -26,6 +27,7 @@ const UserDetail = () => {
   const params = useParams();
 
   const selector = useSelector((state) => state);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (selector) {
@@ -43,8 +45,10 @@ const UserDetail = () => {
     if (user) {
       getUserData();
     }
-  }, [user]);
-  console.log(data);
+    if(!JSON.parse(localStorage.getItem("userss"))){
+      navigate("/login")
+    }
+  }, [user,navigate]);
 
   return (
     <Sidebar>

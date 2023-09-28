@@ -29,6 +29,7 @@ import {
 } from "@chakra-ui/react";
 import { imageURL } from "../../utilities/config";
 import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { TailSpin } from "react-loader-spinner";
 import { DELETE, GET, POST, PUT } from "../../utilities/ApiProvider";
 import { json } from "react-router-dom";
@@ -55,6 +56,7 @@ const MeetingSchedule = () => {
   });
 
   const toast = useToast();
+  const navigate = useNavigate();
 
   const createMeeting = async () => {
     console.log(time)
@@ -169,7 +171,10 @@ const MeetingSchedule = () => {
       cancellUser();
       getCategory();
     }
-  }, [user]);
+    if(!JSON.parse(localStorage.getItem("userss"))){
+      navigate("/login")
+    }
+  }, [user,navigate]);
 
   const deleteMeeting = async (id) => {
     setToggle(true);

@@ -23,12 +23,8 @@ export const Router = ()=>{
             <Route path="/dashboard/user" element={<UserScreen />}/>
             <Route path="/dashboard/CourseDetails/:id" element={<SingleCourse/>}/>
             <Route path="/dashboard/support" element={<ChatsScreen/>}/>
-            <Route path="/dashboard/UserScreen" element={<UserCourses />}/>
             <Route path="/dashboard/Setting" element={<Setting />}/>
             <Route path="/dashboard/Tiers" element={<Tiers />}/>
-            <Route path="/dashboard/MeetingSchdule" element={<MeetingSchedule />}/>
-            <Route path="/dashboard/UploadMembershipVideos/:id" element={<UploadMember />}/>
-            <Route path="/dashboard/subscribers/:id" element={<Subscriber />}/>
             <Route path="/dashboard/UserDetails/:id" element={<UserDetails />}/>
         </Routes>
     </Main>

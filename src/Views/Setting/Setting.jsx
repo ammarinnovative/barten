@@ -32,12 +32,14 @@ import { useEffect, useState } from "react";
 import { POST, PUT } from "../../utilities/ApiProvider";
 import { Form } from "react-router-dom";
 import { useToast } from "@chakra-ui/react";
+import { useNavigate } from "react-router-dom";
 import { Modal } from "antd";
 import { TailSpin } from "react-loader-spinner";
 import { imageURL } from "../../utilities/config";
 
 export const Setting = () => {
   const selector = useSelector((store) => store);
+  const navigate = useNavigate();
   const [selectedUser, setSelectedUser] = useState(null);
   // const id = selector.user.user.data.data._id;
   // const token = selector.user.user.data.data.JWT_TOKEN;
@@ -54,6 +56,15 @@ export const Setting = () => {
       setSelectedUser(selector?.user?.user);
     }
   }, [selector]);
+
+  useEffect(()=>{
+    if(selectedUser){
+     
+    }
+    if(!JSON.parse(localStorage.getItem("userss"))){
+      navigate("/login")
+    }
+  },[selectedUser,navigate]);
 
   const toast = useToast();
 

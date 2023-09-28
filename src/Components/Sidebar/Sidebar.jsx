@@ -67,11 +67,14 @@ const LinkItems = [
 ];
 
 export default function SidebarWithHeader({ children }) {
+  const [user,setUser] = useState()
   const location = useLocation();
+  const navigate = useNavigate();
   const [curLoc, setCurLoc] = useState("Overview");
 
   useEffect(() => {
     let tempLoc = String(location.pathname).split("/")[2];
+    
     if (tempLoc !== "" || tempLoc !== undefined || tempLoc !== null) {
       setCurLoc(tempLoc);
     } else {
@@ -79,10 +82,20 @@ export default function SidebarWithHeader({ children }) {
     }
   }, [location]);
 
+
   const { isOpen, onOpen, onClose } = useDisclosure();
   const selector = useSelector((state) => state);
 
+  useEffect(()=>{
+    if(!selector){
+      navigate("/login");
+    }
+  },[selector])
 
+
+
+
+  
   const [same, setSame] = useState("true");
   return (
     <Box minH="100vh" bg={useColorModeValue("gray.100", "gray.900")}>

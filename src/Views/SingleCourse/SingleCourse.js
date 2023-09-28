@@ -38,6 +38,7 @@ import { useEffect } from "react";
 import { useState } from "react";
 import { TailSpin } from "react-loader-spinner";
 import { useToast } from "@chakra-ui/react";
+import { useNavigate } from "react-router-dom";
 import { GET, POST } from "../../utilities/ApiProvider";
 import { useParams } from "react-router-dom";
 import Item from "antd/es/list/Item";
@@ -60,6 +61,8 @@ export default function SingleCourse() {
     video: [],
   });
 
+  const navigate = useNavigate();
+
   const getVideo = async () => {
     const res = await GET("video/admin", {
       authorization: `bearer ${user?.JWT_TOKEN}`,
@@ -76,7 +79,10 @@ export default function SingleCourse() {
     if (user) {
       getVideo();
     }
-  }, [user]);
+    if(!JSON.parse(localStorage.getItem("userss"))){
+      navigate("/login")
+    }
+  }, [user,navigate]);
 
   const Category = [
     ...new Set(

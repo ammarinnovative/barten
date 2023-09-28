@@ -45,9 +45,11 @@ import {
   Select,
   ModalCloseButton,
 } from "@chakra-ui/react";
+import { useNavigate } from "react-router-dom";
 import userEvent from "@testing-library/user-event";
 import io from "socket.io-client";
 import { message } from "antd";
+import { imageURL } from "../../utilities/config";
 
 export default function ChatsScreen() {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -64,6 +66,7 @@ export default function ChatsScreen() {
   const [category, setCategories] = useState([]);
   const [userList, setUserList] = useState([]);
   const [selectUser, setSelectUser] = useState(false);
+  const navigate = useNavigate();
   const [chatUser, setChatUser] = useState({});
   const GetCategories = async () => {
     // const res =await GET(`courseCategory/getAllCourseCategoryList`,{
@@ -97,7 +100,10 @@ export default function ChatsScreen() {
       GetCategories();
       getMembership();
     }
-  }, [user]);
+    if(!JSON.parse(localStorage.getItem("userss"))){
+      navigate("/login")
+    }
+  }, [user,navigate]);
 
   const CreateAnnouncement = async () => {
     setLoading(true);
@@ -153,6 +159,8 @@ export default function ChatsScreen() {
     setLoading(false);
   };
 
+
+
   const getUser = (data) => {
     setChatUser(data);
     socket?.emit("chatMessages", {
@@ -167,6 +175,8 @@ export default function ChatsScreen() {
   const [socketConnected, setSocketConnected] = useState(false);
   const [messageList, setMessageList] = useState([]);
   const [messageField, setMessageField] = useState("");
+
+  console.log("messageList",messageList);
 
   console.log(messageList);
 
@@ -389,7 +399,8 @@ export default function ChatsScreen() {
                   >
                     {messageList?.length > 0 ? (
                       messageList &&
-                      messageList?.map((data) => (
+                      messageList?.map((data) =>(
+                        
                         <Box
                           key={data?._id}
                           padding={{
@@ -416,7 +427,8 @@ export default function ChatsScreen() {
                             alignItems={"center"}
                             paddingBottom={"20px"}
                           >
-                            <Image
+                            {
+                              user?._id === data?.senderId?<Image
                               width={{
                                 base: "15%",
                                 sm: "8%",
@@ -425,7 +437,20 @@ export default function ChatsScreen() {
                                 "2xl": "",
                               }}
                               src={Avatar4}
-                            ></Image>
+
+                            ></Image>:<Image
+                            width={{
+                              base: "15%",
+                              sm: "8%",
+                              md: "3%",
+                              lg: "",
+                              "2xl": "",
+                            }}
+                            src={imageURL+user?.profile_picture}
+
+                          ></Image>
+                            }
+                            
                             <Text
                               fontSize={"md"}
                               bg={

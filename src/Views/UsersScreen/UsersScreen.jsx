@@ -26,6 +26,7 @@ import { useState } from "react";
 import { TailSpin } from "react-loader-spinner";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import Item from "antd/es/list/Item";
 import Pagination from "../../Components/Pagination/Pagination";
 import {
@@ -57,6 +58,7 @@ export const UserScreen = () => {
   const [filterData, setFilterData] = useState([]);
   const [selected, setSelected] = useState("bartender");
   const [btns, setBtns] = useState("");
+  const navigate = useNavigate();
 
   const [field, setField] = useState({
     customer: [],
@@ -97,7 +99,10 @@ export const UserScreen = () => {
     if (user) {
       getUser();
     }
-  }, [user, currentPage]);
+    if(!JSON.parse(localStorage.getItem("userss"))){
+      navigate("/login")
+    }
+  }, [user, currentPage,navigate]);
 
   const btnData = (data) => {
     setFilterData(field[data]);
