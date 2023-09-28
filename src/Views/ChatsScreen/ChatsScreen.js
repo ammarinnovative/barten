@@ -49,7 +49,7 @@ import { useNavigate } from "react-router-dom";
 import userEvent from "@testing-library/user-event";
 import io from "socket.io-client";
 import { message } from "antd";
-import { imageURL } from "../../utilities/config";
+import { imageURL, socketUrl } from "../../utilities/config";
 
 export default function ChatsScreen() {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -182,7 +182,7 @@ export default function ChatsScreen() {
 
   useEffect(() => {
     if (user) {
-      const newSocket = io("http://24.199.93.30:5000");
+      const newSocket = io(socketUrl);
       setSocket(newSocket);
 
       return () => {
