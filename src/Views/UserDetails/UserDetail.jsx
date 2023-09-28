@@ -7,6 +7,7 @@ import {
   Flex,
   Button,
   Image,
+  Stack,
 } from "@chakra-ui/react";
 import Sidebar from "../../Components/Sidebar/Sidebar";
 import { AiFillStar } from "react-icons/ai";
@@ -38,18 +39,12 @@ const UserDetail = () => {
     });
     setData(res?.data);
   };
-  console.log("data",data); 
   useEffect(() => {
     if (user) {
       getUserData();
     }
   }, [user]);
-
-  console.log();
-
-  useEffect(() => {
-    console.log(data);
-  }, [data]);
+  console.log(data);
 
   return (
     <Sidebar>
@@ -228,79 +223,141 @@ const UserDetail = () => {
         </TabList>
         <TabPanels>
           <TabPanel>
-            <Box>
+            <Box display={"flex"} gap={"30px"} flexDirection={"column"}>
               <Text fontSize={"18px"} fontWeight={"semibold"}>
-                2 Shifts
+                {data?.shifts?.length} Shifts
               </Text>
-              <Box
-                display={"flex"}
-                alignItems={"center"}
-                justifyContent={"space-between"}
-              >
-                <Box>
-                  <Box display={"flex"} mt={"30px"} gap={"50px"}>
-                    <Box>
-                      {/* <Text color={"gray.500"}>{data?.shifts?.length && data?.shifts[0]['barName']}</Text> */}
-                      <Text color={"hsl(352.86deg 100% 32.94%)"}>
-                        The Dead Rabbit NYC
-                      </Text>
-                    </Box>
-                    <Box>
-                      <Text color={"gray.500"}>Day</Text>
-                      <Text color={"hsl(352.86deg 100% 32.94%)"}>Monday</Text>
-                    </Box>
-                    <Box>
-                      <Text color={"gray.500"}>Time</Text>
-                      <Text color={"hsl(352.86deg 100% 32.94%)"}>
-                        8pm to 4am
-                      </Text>
-                    </Box>
-                  </Box>
-                  <Box mt={"30px"}>
-                    <Text color={"gray.500"}>Shift Type</Text>
-                    <Text color={"hsl(352.86deg 100% 32.94%)"}>Free</Text>
-                  </Box>
-                </Box>
-                <BsThreeDots color="gray" fontSize={"30px"} />
+              <Box>
+                {data?.shifts && data?.shifts.length > 0 ? (
+                  data?.shifts?.map((item) => {
+                    return (
+                      <Box
+                        display={"flex"}
+                        alignItems={"center"}
+                        margin={"20px 0"}
+                        key={item?._id}
+                        justifyContent={"space-between"}
+                      >
+                        <Box>
+                          <Box display={"flex"} mt={"30px"} gap={"50px"}>
+                            <Box width={"150px"}>
+                              <Text color={"gray.500"}>Bar</Text>
+                              <Text color={"hsl(352.86deg 100% 32.94%)"}>
+                                {" "}
+                                {item?.barName}
+                              </Text>
+                            </Box>
+
+                            <Box width={"150px"}>
+                              <Text color={"gray.500"}>Day</Text>
+                              <Text color={"hsl(352.86deg 100% 32.94%)"}>
+                                {item?.day}
+                              </Text>
+                            </Box>
+                            <Box>
+                              <Text color={"gray.500"}>Time</Text>
+                              <Text color={"hsl(352.86deg 100% 32.94%)"}>
+                                {new Date(item?.startTime).toLocaleTimeString(
+                                  [],
+                                  {
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                    hour12: true,
+                                  }
+                                ) +
+                                  " to " +
+                                  new Date(item?.endTime).toLocaleTimeString(
+                                    [],
+                                    {
+                                      hour: "2-digit",
+                                      minute: "2-digit",
+                                      hour12: true,
+                                    }
+                                  )}
+                              </Text>
+                            </Box>
+                          </Box>
+                          <Box
+                            display={"flex"}
+                            gap={"50px"}
+                            alignItems={"center"}
+                            mt={"30px"}
+                          >
+                            <Box width={"150px"}>
+                              <Text color={"gray.500"}>Shift Type</Text>
+                              <Text color={"hsl(352.86deg 100% 32.94%)"}>
+                                {item?.type}
+                              </Text>
+                            </Box>
+                            <Box width={"400px"}>
+                              <Text color={"gray.500"}>Address</Text>
+                              <Text color={"hsl(352.86deg 100% 32.94%)"}>
+                                {item?.barAddress}
+                              </Text>
+                            </Box>
+                          </Box>
+                          <Box
+                            backgroundColor={"gray"}
+                            marginTop={"10px"}
+                            height={"2px"}
+                            width={"100%"}
+                          ></Box>
+                        </Box>
+                        <BsThreeDots color="gray" fontSize={"30px"} />
+                      </Box>
+                    );
+                  })
+                ) : (
+                  <Text>No data Found</Text>
+                )}
               </Box>
             </Box>
           </TabPanel>
           <TabPanel>
             <Box>
               <Text fontSize={"18px"} m={"20px 0"} fontWeight={"semibold"}>
-                1 promo post
+                {data?.promo?.length} promo post
               </Text>
-              <Box
-                display={"flex"}
-                justifyContent={"space-between"}
-                alignItems={"center"}
-                flexWrap={"wrap"}
-              >
-                <Box display={"flex"} alignItems={"center"} gap={"20px"}>
-                  <Image
-                    height={"20vh"}
-                    objectFit={"cover"}
-                    borderRadius={"8px"}
-                    width={"250px"}
-                    src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTNjIaNvHN82MYXRlSAFJiR7za0fSz26SHJVi-oxoB6La1Uv0h0gG2bhVgFKtc0WzQfHuI&usqp=CAU"
-                    alt="image"
-                  />
-                  <Box>
-                    <Text fontWeight={"semibold"} mb={"10px"}>
-                      New Event
-                    </Text>
-                    <Text color={"gray.500"}>Description</Text>
-                    <Text>
-                      Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                      Omnis, eveniet!
-                    </Text>
-                  </Box>
-                </Box>
-                <Box>
-                  <Text>Pay</Text>
-                  <Text>$100.00</Text>
-                </Box>
-              </Box>
+              {data?.promo && data?.promo.length > 0 ? (
+                data?.promo?.map((item) => {
+                  return (
+                    <Box
+                      display={"flex"}
+                      key={item?._id}
+                      margin={"10px 0"}
+                      justifyContent={"space-between"}
+                      alignItems={"center"}
+                      flexWrap={"wrap"}
+                    >
+                      <Box display={"flex"} alignItems={"center"} gap={"20px"}>
+                        <Box minW={"300px"}>
+                          <Image
+                            height={"20vh"}
+                            objectFit={"cover"}
+                            borderRadius={"8px"}
+                            width={"100%"}
+                            src={imageURL + item?.picture}
+                            alt="image"
+                          />
+                        </Box>
+                        <Box>
+                          <Text fontWeight={"semibold"} mb={"10px"}>
+                            {item?.title}
+                          </Text>
+                          <Text color={"gray.500"}>Description</Text>
+                          <Text>{item?.description}</Text>
+                        </Box>
+                      </Box>
+                      <Box>
+                        <Text>Pay</Text>
+                        <Text>$100.00</Text>
+                      </Box>
+                    </Box>
+                  );
+                })
+              ) : (
+                <Text fontWeight={"bold"} fontSize={"20px"}>No Data Found</Text>
+              )}
             </Box>
           </TabPanel>
         </TabPanels>

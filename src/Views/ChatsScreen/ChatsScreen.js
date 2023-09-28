@@ -153,7 +153,7 @@ export default function ChatsScreen() {
     setLoading(false);
   };
 
-  const getUser = async (data) => {
+  const getUser = (data) => {
     setChatUser(data);
     socket?.emit("chatMessages", {
       senderId: user?._id,
@@ -172,11 +172,19 @@ export default function ChatsScreen() {
 
   useEffect(() => {
     if (user) {
-      setSocket(io("http://24.199.93.30:5000"));
+      const newSocket = io("http://24.199.93.30:5000");
+      setSocket(newSocket);
+
+      return () => {
+        newSocket.disconnect();
+      };
     }
   }, [user]);
 
   useEffect(() => {
+    if (socket == null) {
+      return;
+    }
     socket?.on("chatList", (data) => {
       setUserList(data);
     });
@@ -192,7 +200,7 @@ export default function ChatsScreen() {
       setMessageList((prevMessages) => [...prevMessages, ...newMessages]);
     });
     socket?.on("message", (code) => {
-      console.log("Ammar is here");
+      console.log("code", code);
     });
   }, [socket]);
 
@@ -242,9 +250,12 @@ export default function ChatsScreen() {
           >
             Direct Chats
           </Text>
-          <Stack height={'500px'} overflowX={'hidden !important'} overflow={'scroll'} >
-          <ActiveProfile getUser={getUser} userList={userList} />
-          
+          <Stack
+            height={"500px"}
+            overflowX={"hidden !important"}
+            overflow={"scroll"}
+          >
+            <ActiveProfile getUser={getUser} userList={userList} />
           </Stack>
         </Stack>
         <Modal isOpen={isOpen} size={"xl"} onClose={onClose}>
@@ -347,7 +358,7 @@ export default function ChatsScreen() {
           borderBottom={"1px solid #000"}
           boxShadow={"3px -1px 5px -1px #000"}
           position="relative"
-          height={'700px'}
+          height={"700px"}
         >
           {/* Header */}
 
