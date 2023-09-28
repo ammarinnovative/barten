@@ -436,7 +436,7 @@ export default function ChatsScreen() {
                                 lg: "",
                                 "2xl": "",
                               }}
-                              src={Avatar4}
+                              src={imageURL+user?.profile_picture}
 
                             ></Image>:<Image
                             width={{
@@ -446,7 +446,7 @@ export default function ChatsScreen() {
                               lg: "",
                               "2xl": "",
                             }}
-                            src={imageURL+user?.profile_picture}
+                            src={Avatar4}
 
                           ></Image>
                             }
