@@ -335,7 +335,7 @@ const UserDetail = () => {
                             width={"100%"}
                           ></Box>
                         </Box>
-                        <BsThreeDots color="gray" fontSize={"30px"} />
+                        {/* <BsThreeDots color="gray" fontSize={"30px"} /> */}
                       </Box>
                     );
                   })
