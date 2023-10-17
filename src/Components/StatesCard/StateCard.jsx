@@ -111,7 +111,7 @@ const StateCard = ({ series1, percentage, color }) => {
               {totalUser??"0"}
             </Text>
             <Link to="/dashboard/user">
-            <Text cursor={"pointer"}>View All</Text>
+            <Text mr={"10px"} cursor={"pointer"}>View All</Text>
             </Link>
           </Box>
         </Box>
@@ -119,7 +119,7 @@ const StateCard = ({ series1, percentage, color }) => {
           display={"flex"}
           flexDirection={"column"}
           justifyContent={"space-evenly"}
-          width={{ base: "100%", md: "45%", lg: "35%" }}
+          minWidth={{ base: "100%", md: "45%", lg: "35%" }}
           padding={"15px"}
           backgroundColor={"hsl(352.86deg 100% 32.94%)"}
           borderRadius={"5px"}
@@ -140,7 +140,7 @@ const StateCard = ({ series1, percentage, color }) => {
             <Text color={"white"} fontSize={"30px"} fontWeight={"semibold"}>
               ${totalRevenue??"0"}
             </Text>
-            <Text color={"white"} cursor={"pointer"}>
+            <Text mr={"10px"} color={"white"} cursor={"pointer"}>
               View All
             </Text>
           </Box>
