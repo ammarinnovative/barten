@@ -33,6 +33,8 @@ import { POST, PUT } from "../../utilities/ApiProvider";
 import { Form } from "react-router-dom";
 import { useToast } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
+import { addUser } from "../../reducers/UserReducer";
+import { useDispatch } from "react-redux";
 import { Modal } from "antd";
 import { TailSpin } from "react-loader-spinner";
 import { imageURL } from "../../utilities/config";
@@ -51,6 +53,7 @@ export const Setting = () => {
     confirmPassword: "",
   });
   const [ids, setId] = useState("");
+  const dispatch = useDispatch();
   useEffect(() => {
     if (selector) {
       setSelectedUser(selector?.user?.user);
@@ -90,15 +93,16 @@ export const Setting = () => {
       return;
     }
     const formData = new FormData();
-    formData.append("profilePicture", image);
-    const res = await PUT(
-      `admin/updateProfile/${selectedUser._id}`,
+    formData.append("profile_picture", image);
+    const res = await POST(
+      `users/profilePicture`,
       formData,
       {
         authorization: `bearer ${selectedUser?.verificationToken}`,
       }
     );
-    console.log("res",res);
+    dispatch(addUser(res?.data?.data));
+    console.log("red",res);
     toast({
       position:"bottom-left",
       isClosable:true,
@@ -141,7 +145,7 @@ export const Setting = () => {
     const res = await PUT(`admin/updateUser/${selectedUser?._id}`, data, {
       authorization: `bearer ${selectedUser?.verificationToken}`,
     });
-    console.log("res",res);
+    
 
     if (res.status == 200) {
       toast({
@@ -151,10 +155,12 @@ export const Setting = () => {
         duration: 5000,
         isClosable: true,
       });
+      
       setFields({
         password: "",
         confirmPassword: "",
       });
+      
       setState(false);
     } else {
       toast({

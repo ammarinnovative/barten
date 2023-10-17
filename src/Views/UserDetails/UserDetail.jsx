@@ -14,8 +14,9 @@ import { AiFillStar } from "react-icons/ai";
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from "@chakra-ui/react";
 import { BsThreeDots } from "react-icons/bs";
 import { useParams } from "react-router-dom";
+import { useToast } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
-import { GET } from "../../utilities/ApiProvider";
+import { GET, DELETE, PUT } from "../../utilities/ApiProvider";
 import { imageURL } from "../../utilities/config";
 import { useSelector } from "react-redux";
 import { useEffect } from "react";
@@ -25,6 +26,7 @@ const UserDetail = () => {
   const [user, setUser] = useState("");
   const [data, setData] = useState({});
   const params = useParams();
+  const toast = useToast();
 
   const selector = useSelector((state) => state);
   const navigate = useNavigate();
@@ -45,10 +47,35 @@ const UserDetail = () => {
     if (user) {
       getUserData();
     }
-    if(!JSON.parse(localStorage.getItem("userss"))){
-      navigate("/login")
+    if (!JSON.parse(localStorage.getItem("userss"))) {
+      navigate("/login");
     }
-  }, [user,navigate]);
+  }, [user, navigate]);
+
+  const deletUser = async () => {
+    const res = await PUT(`users/deleteUserByAdmin/${params.id}`,{}, {
+      authorization: `bearer ${user?.verificationToken}`,
+    });
+  console.log("res",res);
+    if (res.status == 200) {
+      toast({
+        position: "bottom-left",
+        isClosable: true,
+        duration: 5000,
+        description: "Deleted successfully",
+        status: "success",
+      });
+      navigate('/dashboard/user')
+    } else {
+      toast({
+        position: "bottom-left",
+        isClosable: true,
+        duration: 5000,
+        description: res.message,
+        status: "error",
+      });
+    }
+  };
 
   return (
     <Sidebar>
@@ -153,6 +180,7 @@ const UserDetail = () => {
               border={"1px solid red"}
               backgroundColor={"transparent"}
               m={{ base: "20px", md: "none" }}
+              onClick={deletUser}
             >
               Delete Account
             </Button>
@@ -360,7 +388,9 @@ const UserDetail = () => {
                   );
                 })
               ) : (
-                <Text fontWeight={"bold"} fontSize={"20px"}>No Data Found</Text>
+                <Text fontWeight={"bold"} fontSize={"20px"}>
+                  No Data Found
+                </Text>
               )}
             </Box>
           </TabPanel>
