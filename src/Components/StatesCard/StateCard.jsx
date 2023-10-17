@@ -85,7 +85,7 @@ const StateCard = ({ series1, percentage, color }) => {
           display={"flex"}
           flexDirection={"column"}
           justifyContent={"space-evenly"}
-          width={{ base: "100%", md: "45%", lg: "35%" }}
+          minWidth={{ base: "100%", md: "45%", lg: "35%" }}
           padding={"15px"}
           backgroundColor={"white"}
           borderRadius={"5px"}
